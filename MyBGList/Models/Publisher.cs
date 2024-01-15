@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyBGList.Models;
 
-[Table($"{nameof(Mechanic)}s")]
-public class Mechanic
+[Table($"{nameof(Publisher)}s")]
+public class Publisher
 {
     [Required]
-    public DateTime CreatedDate { get; set; }
+    public DateTime CreateDate { get; set; }
 
     [Required]
     public DateTime LastModifiedDate { get; set; }
@@ -16,14 +16,8 @@ public class Mechanic
     [Key, Required]
     public int Id { get; set; }
 
-    [Required, MaxLength(200)]
+    [Required]
     public string Name { get; set; } = string.Empty;
 
-    public ICollection<BoardGames_Mechanics>? BoardGames_Mechanics { get; set; }
-
-    [MaxLength(200)]
-    public string? Notes { get; set; }
-
-    [Required]
-    public int Flags { get; set; }
+    public ICollection<BoardGame>? BoardGames { get; set; }
 }

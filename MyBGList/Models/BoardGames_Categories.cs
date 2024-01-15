@@ -2,18 +2,18 @@
 
 namespace MyBGList.Models;
 
-public class BoardGames_Domains
+public class BoardGames_Categories
 {
     [Required]
     public DateTime CreatedDate { get; set; }
 
     [Key, Required]
     public int BoardGameId { get; set; }
-    
+
     public BoardGame? BoardGame { get; set; }
 
     [Key, Required]
-    public int DomainId { get; set; }
-    
-    public Domain? Domain { get; set; }
+    public int CategoryId { get; set; }
+
+    public Category? Category { get; set; }
 }

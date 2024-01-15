@@ -12,8 +12,8 @@ using MyBGList.Models;
 namespace MyBGList.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240115145118_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240115231102_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,10 @@ namespace MyBGList.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AlternateNames")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<int>("BGGRank")
                         .HasColumnType("int");
 
@@ -42,6 +46,9 @@ namespace MyBGList.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Flags")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -66,6 +73,9 @@ namespace MyBGList.Migrations
                     b.Property<int>("PlayTime")
                         .HasColumnType("int");
 
+                    b.Property<int>("PublisherId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("RatingAverage")
                         .HasPrecision(4, 2)
                         .HasColumnType("decimal(4,2)");
@@ -78,7 +88,27 @@ namespace MyBGList.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PublisherId");
+
                     b.ToTable("BoardGames");
+                });
+
+            modelBuilder.Entity("MyBGList.Models.BoardGames_Categories", b =>
+                {
+                    b.Property<int>("BoardGameId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("BoardGameId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("BoardGames_Categories");
                 });
 
             modelBuilder.Entity("MyBGList.Models.BoardGames_Domains", b =>
@@ -117,7 +147,7 @@ namespace MyBGList.Migrations
                     b.ToTable("BoardGames_Mechanics");
                 });
 
-            modelBuilder.Entity("MyBGList.Models.Domain", b =>
+            modelBuilder.Entity("MyBGList.Models.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -133,6 +163,37 @@ namespace MyBGList.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categorys");
+                });
+
+            modelBuilder.Entity("MyBGList.Models.Domain", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Flags")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Notes")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -152,6 +213,9 @@ namespace MyBGList.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Flags")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("datetime2");
 
@@ -160,9 +224,66 @@ namespace MyBGList.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("Notes")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Mechanics");
+                });
+
+            modelBuilder.Entity("MyBGList.Models.Publisher", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Publishers");
+                });
+
+            modelBuilder.Entity("MyBGList.Models.BoardGame", b =>
+                {
+                    b.HasOne("MyBGList.Models.Publisher", "Publisher")
+                        .WithMany("BoardGames")
+                        .HasForeignKey("PublisherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Publisher");
+                });
+
+            modelBuilder.Entity("MyBGList.Models.BoardGames_Categories", b =>
+                {
+                    b.HasOne("MyBGList.Models.BoardGame", "BoardGame")
+                        .WithMany("BoardGames_Categories")
+                        .HasForeignKey("BoardGameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyBGList.Models.Category", "Category")
+                        .WithMany("BoardGames_Categories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BoardGame");
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("MyBGList.Models.BoardGames_Domains", b =>
@@ -205,9 +326,16 @@ namespace MyBGList.Migrations
 
             modelBuilder.Entity("MyBGList.Models.BoardGame", b =>
                 {
+                    b.Navigation("BoardGames_Categories");
+
                     b.Navigation("BoardGames_Domains");
 
                     b.Navigation("BoardGames_Mechanics");
+                });
+
+            modelBuilder.Entity("MyBGList.Models.Category", b =>
+                {
+                    b.Navigation("BoardGames_Categories");
                 });
 
             modelBuilder.Entity("MyBGList.Models.Domain", b =>
@@ -218,6 +346,11 @@ namespace MyBGList.Migrations
             modelBuilder.Entity("MyBGList.Models.Mechanic", b =>
                 {
                     b.Navigation("BoardGames_Mechanics");
+                });
+
+            modelBuilder.Entity("MyBGList.Models.Publisher", b =>
+                {
+                    b.Navigation("BoardGames");
                 });
 #pragma warning restore 612, 618
         }

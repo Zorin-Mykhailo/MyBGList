@@ -4,14 +4,38 @@ namespace MyBGList.Models;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<BoardGame>()
+            .HasOne(o => o.Publisher)
+            .WithMany(m => m.BoardGames)
+            .HasForeignKey(f => f.PublisherId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BoardGames_Categories>()
+            .HasKey(k => new { k.BoardGameId, k.CategoryId });
+
+        modelBuilder.Entity<BoardGames_Categories>()
+            .HasOne(o => o.BoardGame)
+            .WithMany(m => m.BoardGames_Categories)
+            .HasForeignKey(f => f.BoardGameId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BoardGames_Categories>()
+            .HasOne(o => o.Category)
+            .WithMany(m => m.BoardGames_Categories)
+            .HasForeignKey(f => f.CategoryId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<BoardGames_Domains>()
-            .HasKey(e => new {e.BoardGameId, e.DomainId});
+            .HasKey(k => new { k.BoardGameId, k.DomainId });
 
         modelBuilder.Entity<BoardGames_Domains>()
             .HasOne(o => o.BoardGame)
@@ -28,7 +52,7 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<BoardGames_Mechanics>()
-            .HasKey(e => new {e.BoardGameId, e.MechanicId});
+            .HasKey(k => new { k.BoardGameId, k.MechanicId });
 
         modelBuilder.Entity<BoardGames_Mechanics>()
             .HasOne(o => o.BoardGame)
@@ -47,11 +71,15 @@ public class AppDbContext : DbContext
 
     public DbSet<BoardGame> BoardGames => Set<BoardGame>();
 
-    public DbSet<Domain> Domains => Set<Domain>();
-
-    public DbSet<Mechanic> Mechanics => Set<Mechanic>();
+    public DbSet<BoardGames_Categories> BoardGames_Categories => Set<BoardGames_Categories>();
 
     public DbSet<BoardGames_Domains> BoardGames_Domains => Set<BoardGames_Domains>();
 
     public DbSet<BoardGames_Mechanics> BoardGames_Mechanics => Set<BoardGames_Mechanics>();
+
+    public DbSet<Domain> Domains => Set<Domain>();
+
+    public DbSet<Mechanic> Mechanics => Set<Mechanic>();
+
+    public DbSet<Publisher> Publishers => Set<Publisher>();
 }
