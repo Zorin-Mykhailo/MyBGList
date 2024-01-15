@@ -23,7 +23,7 @@ public class BoardGamesController : ControllerBase
         {
             Data = new BoardGame[]
             {
-                new BoardGame()
+                new ()
                 {
                     Id = 1,
                     Name = "Axis & Allies",
@@ -31,7 +31,7 @@ public class BoardGamesController : ControllerBase
                     MinPlayers = 2,
                     MaxPlayers = 5
                 },
-                new BoardGame()
+                new ()
                 {
                     Id = 2,
                     Name = "Citadels",
@@ -39,7 +39,7 @@ public class BoardGamesController : ControllerBase
                     MinPlayers = 2,
                     MaxPlayers = 8
                 },
-                new BoardGame()
+                new ()
                 {
                     Id = 3,
                     Name = "Terraforming Mars",
