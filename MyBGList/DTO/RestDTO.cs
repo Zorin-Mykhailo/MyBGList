@@ -1,4 +1,6 @@
-﻿namespace MyBGList.DTO;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MyBGList.DTO;
 
 public class RestDTO<T>
 {
