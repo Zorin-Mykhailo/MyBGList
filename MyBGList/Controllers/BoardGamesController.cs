@@ -21,16 +21,16 @@ public class BoardGamesController : ControllerBase
 
     [HttpGet(Name = "GetBoardGames")]
     [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)]
-    public async Task<RestDTO<BoardGame[]>> GetAsync(int pageIndex = 0, int pageSize = 10, string? sortColumn = "Name", string? sortOrder = "ASC", string? filterQuery = null)
+    public async Task<RestDTO<BoardGame[]>> GetAsync(int pageIndex = 0, int pageSize = 10, string? sortColumn = "Name", string? sortOrder = "ASC", string? nameFilter = null)
     {
         var query = _context.BoardGames.AsQueryable();
-        int? recordsCount = null;
+        int? filteredRecordsCount = null;
         if (!string.IsNullOrWhiteSpace(sortColumn))
         {
-            if(!string.IsNullOrWhiteSpace(filterQuery) && string.Equals(sortColumn, "Name", StringComparison.InvariantCultureIgnoreCase))
+            if(!string.IsNullOrWhiteSpace(nameFilter) && string.Equals(sortColumn, "Name", StringComparison.InvariantCultureIgnoreCase))
             {
-                query = query.Where(b => b.Name.Contains(filterQuery));
-                recordsCount = await query.CountAsync();
+                query = query.Where(b => b.Name.Contains(nameFilter));
+                filteredRecordsCount = await query.CountAsync();
             }
             query = query.OrderBy($"{sortColumn} {sortOrder ?? "ASC"}");
         }
@@ -43,7 +43,7 @@ public class BoardGamesController : ControllerBase
             Data = await query.ToArrayAsync(),
             PageIndex = pageIndex,
             PageSize = pageSize,
-            RecordCount = recordsCount ?? await _context.BoardGames.CountAsync(),
+            RecordCount = filteredRecordsCount ?? await _context.BoardGames.CountAsync(),
             Links = [new(Url.Action(null, "BoardGame", new { pageIndex, pageSize }, Request.Scheme)!, "self", "GET")]
         };
     }
