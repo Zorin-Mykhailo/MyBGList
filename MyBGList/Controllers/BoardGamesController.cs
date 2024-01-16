@@ -71,4 +71,22 @@ public class BoardGamesController : ControllerBase
             Links = [new(Url.Action(null, "BoardGames", model, Request.Scheme)!, "self", "POST")]
         };
     }
+
+
+    [HttpDelete(Name = "DeleteBoardGame"), ResponseCache(NoStore = true)]
+    public async Task<RestDTO<BoardGame?>> DeleteAsync(int id)
+    {
+        var boardGame = await _context.BoardGames.Where(e => e.Id == id).FirstOrDefaultAsync();
+        if (boardGame != null)
+        {
+            _context.BoardGames.Remove(boardGame);
+            await _context.SaveChangesAsync();
+        }
+
+        return new RestDTO<BoardGame?>()
+        {
+            Data = boardGame,
+            Links = [new(Url.Action(null, "BoardGames", id, Request.Scheme)!, "self", "DELETE")]
+        };
+    }
 }
