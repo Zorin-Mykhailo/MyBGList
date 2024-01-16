@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MyBGList.DTO;
 using MyBGList.Models;
 
@@ -8,50 +8,25 @@ namespace MyBGList.Controllers;
 [ApiController]
 public class BoardGamesController : ControllerBase
 {
+    private readonly AppDbContext _context;
     private readonly ILogger<BoardGamesController> _logger;
 
-    public BoardGamesController(ILogger<BoardGamesController> logger)
+    public BoardGamesController(AppDbContext appDbContext, ILogger<BoardGamesController> logger)
     {
+        _context = appDbContext;
         _logger = logger;
     }
 
     [HttpGet(Name = "GetBoardGames")]
     [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)]
-    public RestDTO<BoardGame[]> Get()
+    public async Task<RestDTO<BoardGame[]>> GetAsync()
     {
+        DbSet<BoardGame> query = _context.BoardGames;
+
         return new RestDTO<BoardGame[]>
         {
-            Data = new BoardGame[]
-            {
-                new ()
-                {
-                    Id = 1,
-                    Name = "Axis & Allies",
-                    Year = 1981,
-                    MinPlayers = 2,
-                    MaxPlayers = 5
-                },
-                new ()
-                {
-                    Id = 2,
-                    Name = "Citadels",
-                    Year = 2000,
-                    MinPlayers = 2,
-                    MaxPlayers = 8
-                },
-                new ()
-                {
-                    Id = 3,
-                    Name = "Terraforming Mars",
-                    Year = 2016,
-                    MinPlayers = 1,
-                    MaxPlayers = 5
-                }
-            },
-            Links = new List<LinkDTO>
-            {
-                new (Url.Action(null, "BoardGames", null, Request.Scheme)!, "self", "GET")
-            }
+            Data = await query.ToArrayAsync(),
+            Links = [ new (Url.Action(null, "BoardGame", null, Request.Scheme)!, "self", "GET") ]
         };
     }
 }
