@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Other", "Other", "{46FBBC1C-D541-46C7-A441-881C90DB99E1}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		Test_SeedController.rest = Test_SeedController.rest
 	EndProjectSection
 EndProject
 Global
