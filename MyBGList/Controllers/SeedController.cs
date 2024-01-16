@@ -28,15 +28,15 @@ public class SeedController : ControllerBase
 
     [HttpPut(Name = "Seed")]
     [ResponseCache(NoStore = true)]
-    public async Task<JsonResult> PutAsync()
+    public async Task<JsonResult> PutAsync(int? id = null)
     {
-        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        CsvConfiguration config = new (CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = true,
             Delimiter = ";",
         };
         using StreamReader reader = new(Path.Combine(_env.ContentRootPath, "Data/bgg_dataset.csv"));
-        using CsvReader csv = new CsvReader(reader, config);
+        using CsvReader csv = new (reader, config);
         Dictionary<int, BoardGame> existingBoardGames = await _context.BoardGames.ToDictionaryAsync(k => k.Id);
         Dictionary<string, Domain> existingDomains = await _context.Domains.ToDictionaryAsync(k => k.Name);
         Dictionary<string, Mechanic> existingMechanics = await _context.Mechanics.ToDictionaryAsync(k => k.Name);
@@ -45,9 +45,12 @@ public class SeedController : ControllerBase
         
         IEnumerable<BggRecord> records = csv.GetRecords<BggRecord>();
         int skippedRows = 0;
-        foreach (var record in records)
+        foreach (BggRecord record in records)
         {
-            if (!record.ID.HasValue || string.IsNullOrEmpty(record.Name) || existingBoardGames.ContainsKey(record.ID.Value))
+            if (!record.ID.HasValue 
+                || string.IsNullOrEmpty(record.Name) 
+                || existingBoardGames.ContainsKey(record.ID.Value) 
+                || (id.HasValue && id.Value != record.ID.Value))
             {
                 skippedRows++;
                 continue;
@@ -95,9 +98,9 @@ public class SeedController : ControllerBase
                 }
 
             if(!string.IsNullOrEmpty(record.Mechanics))
-                foreach(var mechanicName in record.Mechanics.Split(",", StringSplitOptions.TrimEntries).Distinct(StringComparer.InvariantCultureIgnoreCase))
+                foreach(string? mechanicName in record.Mechanics.Split(",", StringSplitOptions.TrimEntries).Distinct(StringComparer.InvariantCultureIgnoreCase))
                 {
-                    var mechanic = existingMechanics.GetValueOrDefault(mechanicName);
+                    Mechanic? mechanic = existingMechanics.GetValueOrDefault(mechanicName);
                     if(mechanic == null)
                     {
                         mechanic = new()
@@ -118,7 +121,7 @@ public class SeedController : ControllerBase
                 }
         }
 
-        String sqlQuery = $"SET IDENTITY_INSERT {typeof(BoardGame).Name}s";
+        string sqlQuery = $"SET IDENTITY_INSERT {typeof(BoardGame).Name}s";
 
         using var transaction = _context.Database.BeginTransaction();
         _context.Database.ExecuteSqlRaw($"{sqlQuery} ON");

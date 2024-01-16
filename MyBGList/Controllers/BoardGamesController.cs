@@ -53,13 +53,22 @@ public class BoardGamesController : ControllerBase
     [HttpPost(Name = "UpdateBoardGame"), ResponseCache(NoStore = true)]
     public async Task<RestDTO<BoardGame?>> PostAsync(BoardGameDTO model)
     {
-        var boardGame = await _context.BoardGames.Where(e => e.Id == model.Id).FirstOrDefaultAsync();
+        BoardGame? boardGame = await _context.BoardGames.Where(e => e.Id == model.Id).FirstOrDefaultAsync();
         if(boardGame != null)
         {
             if(!string.IsNullOrEmpty(model.Name))
                 boardGame.Name = model.Name;
             if(model.Year.HasValue && model.Year.Value > 0)
                 boardGame.Year = model.Year.Value;
+            if(model.MinPlayers.HasValue && model.MinPlayers > 0)
+                boardGame.MinPlayers = model.MinPlayers.Value;
+            if(model.MaxPlayers.HasValue && model.MaxPlayers > 0)
+                boardGame.MaxPlayers = model.MaxPlayers.Value;
+            if(model.PlayTime.HasValue && model.PlayTime.Value > 0)
+                boardGame.PlayTime = model.PlayTime.Value;
+            if(model.MinAge.HasValue &&  model.MinAge.Value > 0)
+                boardGame.MinAge = model.MinAge.Value;
+
             boardGame.LastModifiedDate = DateTime.Now;
             _context.BoardGames.Update(boardGame);
             await _context.SaveChangesAsync();
@@ -69,23 +78,33 @@ public class BoardGamesController : ControllerBase
         {
             Data = boardGame,
             Links = [new(Url.Action(null, "BoardGames", model, Request.Scheme)!, "self", "POST")]
-        };
+        };        
     }
 
 
     [HttpDelete(Name = "DeleteBoardGame"), ResponseCache(NoStore = true)]
-    public async Task<RestDTO<BoardGame?>> DeleteAsync(int id)
+    public async Task<RestDTO<BoardGame[]?>> DeleteAsync(int[] id)
     {
-        var boardGame = await _context.BoardGames.Where(e => e.Id == id).FirstOrDefaultAsync();
-        if (boardGame != null)
+        HashSet<int> ids = new (id);
+        BoardGame[] boardGames = await _context.BoardGames.Where(e => ids.Contains(e.Id)).ToArrayAsync();
+
+        if(boardGames.Any())
         {
-            _context.BoardGames.Remove(boardGame);
+            _context.BoardGames.RemoveRange(boardGames);
             await _context.SaveChangesAsync();
         }
 
-        return new RestDTO<BoardGame?>()
+        //BoardGame? boardGame = await _context.BoardGames.Where(e => e.Id == id).FirstOrDefaultAsync();
+        //if (boardGame != null)
+        //{
+        //    _context.BoardGames.Re.Remove(boardGame);
+        //    await _context.SaveChangesAsync();
+        //}
+
+        return new RestDTO<BoardGame[]?>()
         {
-            Data = boardGame,
+            Data = boardGames,
+            RecordCount = boardGames?.Length ?? 0,
             Links = [new(Url.Action(null, "BoardGames", id, Request.Scheme)!, "self", "DELETE")]
         };
     }

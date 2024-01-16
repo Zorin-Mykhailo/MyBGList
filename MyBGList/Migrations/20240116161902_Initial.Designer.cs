@@ -12,7 +12,7 @@ using MyBGList.Models;
 namespace MyBGList.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240116101522_Initial")]
+    [Migration("20240116161902_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
