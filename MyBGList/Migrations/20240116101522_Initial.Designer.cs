@@ -12,7 +12,7 @@ using MyBGList.Models;
 namespace MyBGList.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240115231102_Initial")]
+    [Migration("20240116101522_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -41,8 +41,8 @@ namespace MyBGList.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("ComplexityAverage")
-                        .HasPrecision(4, 2)
-                        .HasColumnType("decimal(4,2)");
+                        .HasPrecision(14, 8)
+                        .HasColumnType("decimal(14,8)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -73,12 +73,12 @@ namespace MyBGList.Migrations
                     b.Property<int>("PlayTime")
                         .HasColumnType("int");
 
-                    b.Property<int>("PublisherId")
+                    b.Property<int?>("PublisherId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("RatingAverage")
-                        .HasPrecision(4, 2)
-                        .HasColumnType("decimal(4,2)");
+                        .HasPrecision(14, 8)
+                        .HasColumnType("decimal(14,8)");
 
                     b.Property<int>("UsersRelated")
                         .HasColumnType("int");
@@ -249,7 +249,8 @@ namespace MyBGList.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
@@ -261,8 +262,7 @@ namespace MyBGList.Migrations
                     b.HasOne("MyBGList.Models.Publisher", "Publisher")
                         .WithMany("BoardGames")
                         .HasForeignKey("PublisherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Publisher");
                 });

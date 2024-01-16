@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq.Dynamic.Core;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyBGList.DTO;
 using MyBGList.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MyBGList.Controllers;
 [Route("[controller]")]
@@ -19,14 +21,30 @@ public class BoardGamesController : ControllerBase
 
     [HttpGet(Name = "GetBoardGames")]
     [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)]
-    public async Task<RestDTO<BoardGame[]>> GetAsync()
+    public async Task<RestDTO<BoardGame[]>> GetAsync(int pageIndex = 0, int pageSize = 10, string? sortColumn = "Name", string? sortOrder = "ASC", string? filterQuery = null)
     {
-        DbSet<BoardGame> query = _context.BoardGames;
+        var query = _context.BoardGames.AsQueryable();
+        int? recordsCount = null;
+        if (!string.IsNullOrWhiteSpace(sortColumn))
+        {
+            if(!string.IsNullOrWhiteSpace(filterQuery) && string.Equals(sortColumn, "Name", StringComparison.InvariantCultureIgnoreCase))
+            {
+                query = query.Where(b => b.Name.Contains(filterQuery));
+                recordsCount = await query.CountAsync();
+            }
+            query = query.OrderBy($"{sortColumn} {sortOrder ?? "ASC"}");
+        }
+        query = query
+            .Skip(pageIndex * pageSize)
+            .Take(pageSize);
 
         return new RestDTO<BoardGame[]>
         {
             Data = await query.ToArrayAsync(),
-            Links = [ new (Url.Action(null, "BoardGame", null, Request.Scheme)!, "self", "GET") ]
+            PageIndex = pageIndex,
+            PageSize = pageSize,
+            RecordCount = recordsCount ?? await _context.BoardGames.CountAsync(),
+            Links = [new(Url.Action(null, "BoardGame", new { pageIndex, pageSize }, Request.Scheme)!, "self", "GET")]
         };
     }
 }

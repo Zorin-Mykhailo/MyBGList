@@ -14,7 +14,7 @@ public class AppDbContext : DbContext
             .HasOne(o => o.Publisher)
             .WithMany(m => m.BoardGames)
             .HasForeignKey(f => f.PublisherId)
-            .IsRequired()
+            //.IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<BoardGames_Categories>()

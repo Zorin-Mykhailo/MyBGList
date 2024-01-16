@@ -118,8 +118,13 @@ public class SeedController : ControllerBase
                 }
         }
 
-        
+        String sqlQuery = $"SET IDENTITY_INSERT {typeof(BoardGame).Name}s";
+
+        using var transaction = _context.Database.BeginTransaction();
+        _context.Database.ExecuteSqlRaw($"{sqlQuery} ON");
         await _context.SaveChangesAsync();
+        _context.Database.ExecuteSqlRaw($"{sqlQuery} OFF");
+        transaction.Commit();
 
         return new JsonResult(new
         {

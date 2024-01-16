@@ -68,7 +68,7 @@ namespace MyBGList.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -85,7 +85,7 @@ namespace MyBGList.Migrations
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     AlternateNames = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    PublisherId = table.Column<int>(type: "int", nullable: false),
+                    PublisherId = table.Column<int>(type: "int", nullable: true),
                     Year = table.Column<int>(type: "int", nullable: false),
                     Flags = table.Column<int>(type: "int", nullable: false),
                     MinPlayers = table.Column<int>(type: "int", nullable: false),
@@ -93,9 +93,9 @@ namespace MyBGList.Migrations
                     PlayTime = table.Column<int>(type: "int", nullable: false),
                     MinAge = table.Column<int>(type: "int", nullable: false),
                     UsersRelated = table.Column<int>(type: "int", nullable: false),
-                    RatingAverage = table.Column<decimal>(type: "decimal(4,2)", precision: 4, scale: 2, nullable: false),
+                    RatingAverage = table.Column<decimal>(type: "decimal(14,8)", precision: 14, scale: 8, nullable: false),
                     BGGRank = table.Column<int>(type: "int", nullable: false),
-                    ComplexityAverage = table.Column<decimal>(type: "decimal(4,2)", precision: 4, scale: 2, nullable: false),
+                    ComplexityAverage = table.Column<decimal>(type: "decimal(14,8)", precision: 14, scale: 8, nullable: false),
                     OwnedUsers = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
