@@ -6,7 +6,14 @@ using MyBGList.Swagger;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(opt =>
+{
+    var msgProvider = opt.ModelBindingMessageProvider;
+    msgProvider.SetValueIsInvalidAccessor(x => $"The value '{x}' is invalid.");
+    msgProvider.SetValueMustBeANumberAccessor(x => $"The field '{x}' must be a number.");
+    msgProvider.SetAttemptedValueIsInvalidAccessor((x, y) => $"The value '{x}' is not valid for {y}");
+    msgProvider.SetMissingKeyOrValueAccessor(() => "A value is required");
+});
 
 builder.Services.AddCors(opt =>
 {
