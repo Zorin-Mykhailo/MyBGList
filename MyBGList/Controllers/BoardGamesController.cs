@@ -23,38 +23,30 @@ public class BoardGamesController : ControllerBase
 
 
     [HttpGet(Name = "GetBoardGames"), ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)]
-    public async Task<RestDTO<BoardGame[]>> GetAsync(
-        int pageIndex = 0, 
-        [Range(1, 100)] 
-        int pageSize = 10,
-        [NameOfProperty(typeof(BoardGameDTO))]
-        string? sortColumn = "Name",
-        [AllowedStrings(["ASC", "DESC"])]
-        string? sortOrder = "ASC", 
-        string? nameFilter = null)
+    public async Task<RestDTO<BoardGame[]>> GetAsync([FromQuery]RequestDTO input)
     {
         var query = _context.BoardGames.AsQueryable();
         int? filteredRecordsCount = null;
-        if (!string.IsNullOrWhiteSpace(sortColumn))
+        if (!string.IsNullOrWhiteSpace(input.FilterQuery))
         {
-            if(!string.IsNullOrWhiteSpace(nameFilter) && string.Equals(sortColumn, "Name", StringComparison.InvariantCultureIgnoreCase))
+            if(!string.IsNullOrWhiteSpace(input.FilterQuery) && string.Equals(input.SortColumn, "Name", StringComparison.InvariantCultureIgnoreCase))
             {
-                query = query.Where(b => b.Name.Contains(nameFilter));
+                query = query.Where(b => b.Name.Contains(input.FilterQuery));
                 filteredRecordsCount = await query.CountAsync();
             }
-            query = query.OrderBy($"{sortColumn} {sortOrder ?? "ASC"}");
+            query = query.OrderBy($"{input.SortColumn} {input.SortOrder ?? "ASC"}");
         }
         query = query
-            .Skip(pageIndex * pageSize)
-            .Take(pageSize);
+            .Skip(input.PageIndex * input.PageSize)
+            .Take(input.PageSize);
 
         return new RestDTO<BoardGame[]>
         {
             Data = await query.ToArrayAsync(),
-            PageIndex = pageIndex,
-            PageSize = pageSize,
+            PageIndex = input.PageIndex,
+            PageSize = input.PageSize,
             RecordCount = filteredRecordsCount ?? await _context.BoardGames.CountAsync(),
-            Links = [new(Url.Action(null, "BoardGame", new { pageIndex, pageSize }, Request.Scheme)!, "self", "GET")]
+            Links = [new(Url.Action(null, "BoardGame", new { input.PageIndex, input.PageSize }, Request.Scheme)!, "self", "GET")]
         };
     }
 
