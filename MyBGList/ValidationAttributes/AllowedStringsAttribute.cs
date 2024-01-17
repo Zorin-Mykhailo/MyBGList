@@ -9,14 +9,14 @@ public class AllowedStringsAttribute: ValidationAttribute
     public AllowedStringsAttribute(string[] allowedValues) : base("Value must be one of the following: [{0}].")
     {
         ArgumentNullException.ThrowIfNull(allowedValues);
-        AllowedVaues = new (allowedValues.Select(v => v.ToLower()));
+        AllowedVaues = new (allowedValues);
     }
 
 
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
         string? strValue = value as string;
-        return string.IsNullOrEmpty(strValue) || !AllowedVaues.Contains(strValue.ToLower())
+        return string.IsNullOrEmpty(strValue) || !AllowedVaues.Contains(strValue)
             ? new ValidationResult(FormatErrorMessage(string.Join(", ", AllowedVaues)))
             : ValidationResult.Success;
     }

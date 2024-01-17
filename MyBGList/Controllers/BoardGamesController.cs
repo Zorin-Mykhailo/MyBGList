@@ -103,13 +103,6 @@ public class BoardGamesController : ControllerBase
             await _context.SaveChangesAsync();
         }
 
-        //BoardGame? boardGame = await _context.BoardGames.Where(e => e.Id == id).FirstOrDefaultAsync();
-        //if (boardGame != null)
-        //{
-        //    _context.BoardGames.Re.Remove(boardGame);
-        //    await _context.SaveChangesAsync();
-        //}
-
         return new RestDTO<BoardGame[]?>()
         {
             Data = boardGames,
