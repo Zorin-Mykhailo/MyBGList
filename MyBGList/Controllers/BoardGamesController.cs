@@ -23,7 +23,7 @@ public class BoardGamesController : ControllerBase
 
 
     [HttpGet(Name = "GetBoardGames"), ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)]
-    public async Task<RestDTO<BoardGame[]>> GetAsync([FromQuery]RequestDTO<BoardGameDTO> input)    
+    public async Task<RestDTO<BoardGame[]>> GetAsync([FromQuery]RequestDTO<BoardGameDTO> input)
     {
         var query = _context.BoardGames.AsQueryable();
         int? filteredRecordsCount = null;
