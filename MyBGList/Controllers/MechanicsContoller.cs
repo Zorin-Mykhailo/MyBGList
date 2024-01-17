@@ -51,9 +51,7 @@ public class MechanicsController : ControllerBase
     [HttpPost(Name = "UpdateMechanic"), ResponseCache(NoStore = true)]
     public async Task<RestDTO<Mechanic?>> PostAsync(MechanicDTO model)
     {
-        var mechanic = await _context.Mechanics
-            .Where(e => e.Id == model.Id)
-            .FirstOrDefaultAsync();
+        var mechanic = await _context.Mechanics.Where(e => e.Id == model.Id).FirstOrDefaultAsync();
         if(mechanic != null)
         {
             if (!string.IsNullOrEmpty(model.Name))
