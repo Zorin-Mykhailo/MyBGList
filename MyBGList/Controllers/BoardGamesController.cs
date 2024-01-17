@@ -2,10 +2,9 @@
 using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyBGList.Attributes;
+using MyBGList.ValidationAttributes;
 using MyBGList.DTO;
 using MyBGList.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MyBGList.Controllers;
 [Route("[controller]")]
@@ -27,9 +26,10 @@ public class BoardGamesController : ControllerBase
     public async Task<RestDTO<BoardGame[]>> GetAsync(
         int pageIndex = 0, 
         [Range(1, 100)] 
-        int pageSize = 10, 
+        int pageSize = 10,
+        [NameOfProperty(typeof(BoardGameDTO))]
         string? sortColumn = "Name",
-        [AllowedValuesValidator(["ASC", "DESC"])]
+        [AllowedStrings(["ASC", "DESC"])]
         string? sortOrder = "ASC", 
         string? nameFilter = null)
     {
