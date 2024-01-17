@@ -4,7 +4,7 @@ namespace MyBGList.ValidationAttributes;
 
 public class AllowedStringsAttribute: ValidationAttribute
 {
-    private HashSet<string> AllowedVaues { get; set; }
+    public HashSet<string> AllowedVaues { get; private set; }
 
     public AllowedStringsAttribute(string[] allowedValues) : base("Value must be one of the following: [{0}].")
     {
