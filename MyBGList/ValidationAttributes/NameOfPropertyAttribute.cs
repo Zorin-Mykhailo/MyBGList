@@ -7,16 +7,21 @@ public class NameOfPropertyAttribute : ValidationAttribute
 {
     private static Dictionary<Type, HashSet<string>> _entitiesAndProperties = new();
 
-    private Type _entityType;
+    public Type EntityType { get; private set; }
+
+    public HashSet<string> EntityProperties
+    {
+        get => _entitiesAndProperties[EntityType];
+    }
 
     public NameOfPropertyAttribute(Type entityType) : base("Value must be property name of entity {0}")
     {
         ArgumentNullException.ThrowIfNull(entityType);
-        _entityType = entityType;
+        EntityType = entityType;
 
-        if(_entitiesAndProperties.ContainsKey(_entityType)) return;
+        if(_entitiesAndProperties.ContainsKey(EntityType)) return;
 
-        HashSet<string> entityProperties = new(_entityType.GetProperties().Select(p => p.Name));
+        HashSet<string> entityProperties = new(EntityType.GetProperties().Select(p => p.Name));
         _entitiesAndProperties.Add(entityType, entityProperties);
     }
 
@@ -24,8 +29,8 @@ public class NameOfPropertyAttribute : ValidationAttribute
     {
         string? propertyName = value as string;
 
-        return string.IsNullOrEmpty(propertyName) || !_entitiesAndProperties[_entityType].Contains(propertyName)
-            ? new ValidationResult(FormatErrorMessage(_entityType.Name))
+        return string.IsNullOrEmpty(propertyName) || !EntityProperties.Contains(propertyName)
+            ? new ValidationResult(FormatErrorMessage(EntityType.Name))
             : ValidationResult.Success;
     }
 }
