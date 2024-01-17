@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace MyBGList.ValidationAttributes;
 
@@ -18,11 +17,10 @@ public class NameOfPropertyAttribute : ValidationAttribute
     {
         ArgumentNullException.ThrowIfNull(entityType);
         EntityType = entityType;
-
-        if(_entitiesAndProperties.ContainsKey(EntityType)) return;
+        if (_entitiesAndProperties.ContainsKey(EntityType)) return;
 
         HashSet<string> entityProperties = new(EntityType.GetProperties().Select(p => p.Name));
-        _entitiesAndProperties.Add(entityType, entityProperties);
+        _entitiesAndProperties.Add(EntityType, entityProperties);
     }
 
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)

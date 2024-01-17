@@ -23,20 +23,17 @@ public class BoardGamesController : ControllerBase
 
 
     [HttpGet(Name = "GetBoardGames"), ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)]
-    public async Task<RestDTO<BoardGame[]>> GetAsync([FromQuery]RequestDTO input)
+    public async Task<RestDTO<BoardGame[]>> GetAsync([FromQuery]RequestDTO<BoardGameDTO> input)    
     {
         var query = _context.BoardGames.AsQueryable();
         int? filteredRecordsCount = null;
-        if (!string.IsNullOrWhiteSpace(input.FilterQuery))
+        if (!string.IsNullOrWhiteSpace(input.FilterQuery) && string.Equals(input.SortColumn, "Name", StringComparison.InvariantCultureIgnoreCase))
         {
-            if(!string.IsNullOrWhiteSpace(input.FilterQuery) && string.Equals(input.SortColumn, "Name", StringComparison.InvariantCultureIgnoreCase))
-            {
-                query = query.Where(b => b.Name.Contains(input.FilterQuery));
-                filteredRecordsCount = await query.CountAsync();
-            }
-            query = query.OrderBy($"{input.SortColumn} {input.SortOrder ?? "ASC"}");
+            query = query.Where(b => b.Name.Contains(input.FilterQuery));
+            filteredRecordsCount = await query.CountAsync();
         }
         query = query
+            .OrderBy($"{input.SortColumn} {input.SortOrder}")
             .Skip(input.PageIndex * input.PageSize)
             .Take(input.PageSize);
 

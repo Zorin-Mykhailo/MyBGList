@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyBGList.DTO;
 
-public class RequestDTO
+public class RequestDTO<T>: IValidatableObject
 {
     [DefaultValue(0)]
     public int PageIndex { get; set; } = 0;
@@ -20,4 +20,11 @@ public class RequestDTO
 
     [DefaultValue(null)]
     public string? FilterQuery { get; set; } = null;
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        var validator = new NameOfPropertyAttribute(typeof(T));
+        var result = validator.GetValidationResult(SortColumn, validationContext);
+        return (result != null) ? [result] : Array.Empty<ValidationResult>();
+    }
 }

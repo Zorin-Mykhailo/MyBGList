@@ -2,6 +2,7 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using MyBGList.ValidationAttributes;
+using MyBGList.DTO;
 
 namespace MyBGList.Swagger;
 
