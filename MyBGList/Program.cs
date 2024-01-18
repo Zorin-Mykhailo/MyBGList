@@ -2,10 +2,18 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyBGList.Models;
+using MyBGList.Swagger;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(opt =>
+{
+    var msgProvider = opt.ModelBindingMessageProvider;
+    msgProvider.SetValueIsInvalidAccessor(x => $"The value '{x}' is invalid.");
+    msgProvider.SetValueMustBeANumberAccessor(x => $"The field '{x}' must be a number.");
+    msgProvider.SetAttemptedValueIsInvalidAccessor((x, y) => $"The value '{x}' is not valid for {y}");
+    msgProvider.SetMissingKeyOrValueAccessor(() => "A value is required");
+});
 
 builder.Services.AddCors(opt =>
 {
@@ -14,7 +22,10 @@ builder.Services.AddCors(opt =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(opt => {
+    opt.ParameterFilter<SortColumnFilter>();
+    opt.ParameterFilter<SortOrderFilter>();
+});
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 WebApplication app = builder.Build();
