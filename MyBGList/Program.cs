@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MyBGList.Controllers;
 using MyBGList.Models;
 using MyBGList.Swagger;
 
@@ -40,6 +41,12 @@ builder.Logging
 
 WebApplication app = builder.Build();
 
+//using (var scope = app.Services.CreateScope())
+//{
+//    var dataContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//    dataContext.Database.Migrate();
+//}
+
 if(app.Configuration.GetValue<bool>("UseSwagger")) app.UseSwagger().UseSwaggerUI();
 
 if(app.Configuration.GetValue<bool>("UseDeveloperExceptionPage")) app.UseDeveloperExceptionPage();
@@ -65,6 +72,18 @@ app.MapGet("/cod/test", [EnableCors("AnyOrigin"), ResponseCache(NoStore = true)]
         "<noscript>Your client does not support JavaScript</noscript>"
         , "text/html"));
 
+
+
 app.MapControllers().RequireCors("AnyOrigin");
+
+//using (var scope = app.Services.CreateScope())
+//{
+//    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//    var env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+//    var logger = scope.ServiceProvider.GetRequiredService<ILogger<SeedController>>();
+
+//    SeedController seedController = new SeedController(dbContext, env, logger);
+//    _ = seedController.PutAsync();
+//}
 
 app.Run();

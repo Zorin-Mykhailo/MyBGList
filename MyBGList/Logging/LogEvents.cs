@@ -49,5 +49,15 @@ public class LogEvents
             public const int Put = ThisController + Method.Put;
             public const int Delete = ThisController + Method.Delete;
         }
+
+        public class Seed
+        {
+            private const int ThisController = Category.Controllers + 004_0;
+
+            public const int Get = ThisController + Method.Get;
+            public const int Post = ThisController + Method.Post;
+            public const int Put = ThisController + Method.Put;
+            public const int Delete = ThisController + Method.Delete;
+        }
     }
 }

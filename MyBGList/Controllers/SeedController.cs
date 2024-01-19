@@ -3,6 +3,7 @@ using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MyBGList.Logging;
 using MyBGList.Models;
 using MyBGList.Models.Csv;
 using System.Globalization;
@@ -30,6 +31,8 @@ public class SeedController : ControllerBase
     [ResponseCache(NoStore = true)]
     public async Task<JsonResult> PutAsync(int? id = null)
     {
+        _logger.LogWarning(LogEvents.Controller.Seed.Put, "Seeding data");
+
         CsvConfiguration config = new (CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = true,
