@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using MyBGList.ValidationAttributes;
 using MyBGList.DTO;
 using MyBGList.Models;
+using MyBGList.Logging;
 
 namespace MyBGList.Controllers;
 [Route("[controller]")]
@@ -25,6 +26,7 @@ public class BoardGamesController : ControllerBase
     [HttpGet(Name = "GetBoardGames"), ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)]
     public async Task<RestDTO<BoardGame[]>> GetAsync([FromQuery]RequestDTO<BoardGameDTO> input)
     {
+        _logger.LogInformation(LogEvents.Controller.BoardGames.Get, "Get method started");
         var query = _context.BoardGames.AsQueryable();
         int? filteredRecordsCount = null;
         if (!string.IsNullOrWhiteSpace(input.FilterQuery) && string.Equals(input.SortColumn, "Name", StringComparison.InvariantCultureIgnoreCase))
