@@ -28,6 +28,16 @@ builder.Services.AddSwaggerGen(opt => {
 });
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Logging
+    .ClearProviders()
+    .AddSimpleConsole(opt =>
+    {
+        opt.SingleLine = true;
+        opt.TimestampFormat = "HH:mm:ss";
+        opt.UseUtcTimestamp = true;
+    })
+    .AddDebug();
+
 WebApplication app = builder.Build();
 
 if(app.Configuration.GetValue<bool>("UseSwagger")) app.UseSwagger().UseSwaggerUI();
